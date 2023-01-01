@@ -1,10 +1,23 @@
 package main
 
-func main() {
+import (
+	"os"
+	"path/filepath"
+)
 
-	for _, p := range Products {
-		Printfln("Product: %v, Category: %v, Price: $%.2f", p.Name, p.Category, p.Price)
+func main() {
+	path, err := os.UserHomeDir()
+
+	if err == nil {
+
+		path = filepath.Join(path, "MyApp", "MyTempFile.json")
 
 	}
+
+	Printfln("Full path: %v", path)
+	Printfln("Volume name: %v", filepath.VolumeName(path))
+	Printfln("Dir component: %v", filepath.Dir(path))
+	Printfln("File component: %v", filepath.Base(path))
+	Printfln("File extension: %v", filepath.Ext(path))
 
 }
