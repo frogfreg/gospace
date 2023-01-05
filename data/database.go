@@ -16,7 +16,7 @@ func listDrivers() {
 
 }
 
-func openDatabase(db *sql.DB, err error) {
+func openDatabase() (db *sql.DB, err error) {
 	db, err = sql.Open("sqlite", "products.db")
 
 	if err == nil {
