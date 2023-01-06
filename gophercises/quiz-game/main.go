@@ -7,12 +7,14 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 )
 
 func main() {
 
 	var filename string
 	var timeLimit int64
+
 	flag.StringVar(&filename, "csv", "problems.csv", "The csv file with the problems to be processed")
 	flag.Int64Var(&timeLimit, "limit", 30, "The amount of time to answer the quiz")
 	flag.Parse()
@@ -34,17 +36,37 @@ func main() {
 
 	var correct int
 
+	timer := time.NewTimer(time.Duration(timeLimit) * time.Second)
+
+	// <-timer.C
+
+problemLoop:
 	for index, problem := range problems {
 
-		var answer string
-
 		fmt.Printf("Problem %v: %v = ", index+1, problem[0])
-		fmt.Scan(&answer)
+		answerChan := make(chan string)
 
-		if strings.TrimSpace(answer) == strings.TrimSpace(problem[1]) {
-			correct++
+		go func() {
+			var answer string
+
+			fmt.Scan(&answer)
+			answerChan <- answer
+
+		}()
+
+		select {
+
+		case <-timer.C:
+			fmt.Printf("\nYour score is %v out of %v", correct, len(problems))
+			break problemLoop
+
+		case answer := <-answerChan:
+			if strings.TrimSpace(answer) == strings.TrimSpace(problem[1]) {
+				correct++
+			}
+
 		}
-		// fmt.Println()
+
 	}
 
 	fmt.Printf("Your score is %v out of %v", correct, len(problems))
